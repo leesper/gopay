@@ -31,6 +31,10 @@ func (req unifiedOrderReq) URI() string {
 	return "https://api.mch.weixin.qq.com/pay/unifiedorder"
 }
 
+func (req unifiedOrderReq) SandBoxURI() string {
+	return "https://api.mch.weixin.qq.com/sandboxnew/pay/unifiedorder"
+}
+
 // UnifiedOrderRsp is the response returned by /pay/unifiedorder.
 type UnifiedOrderRsp struct {
 	XMLName     xml.Name `xml:"xml"`
@@ -59,6 +63,10 @@ type queryOrderReq struct {
 
 func (req queryOrderReq) URI() string {
 	return "https://api.mch.weixin.qq.com/pay/orderquery"
+}
+
+func (req queryOrderReq) SandBoxURI() string {
+	return "https://api.mch.weixin.qq.com/sandboxnew/pay/orderquery"
 }
 
 // QueryOrderRsp is the response returned by /pay/orderquery
@@ -119,4 +127,21 @@ type AsyncNotificationResult struct {
 	Attach         string `xml:"attach"`
 	TimeEnd        string `xml:"time_end"`
 	TradeStateDesc string `xml:"trade_state_desc"`
+}
+
+type getSandBoxSignKeyReq struct {
+	MchID    string `xml:"mch_id"`
+	NonceStr string `xml:"nonce_str"`
+}
+
+func (req getSandBoxSignKeyReq) SandBoxURI() string {
+	return "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey"
+}
+
+// GetSandBoxSignKeyRsp is the response returned by
+type GetSandBoxSignKeyRsp struct {
+	ReturnCode     string `xml:"return_code"`
+	ReturnMsg      string `xml:"return_msg"`
+	MchID          string `xml:"mch_id"`
+	SandBoxSignKey string `xml:"sandbox_signkey"`
 }

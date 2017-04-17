@@ -21,6 +21,7 @@ type Config struct {
 	MchID     string
 	NotifyURL string
 	TradeType string
+	SandBox   bool
 }
 
 // Client handles all transactions.
@@ -64,7 +65,12 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*Un
 	reqMap["sign"] = signature(reqMap, c.config.AppKey)
 	xmlStr := toXMLStr(reqMap)
 
-	data, err := c.doHTTPRequest(req.URI(), xmlStr)
+	uri := req.URI()
+	if c.config.SandBox {
+		uri = req.SandBoxURI()
+	}
+
+	data, err := c.doHTTPRequest(uri, xmlStr)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +142,12 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 	reqMap["sign"] = signature(reqMap, c.config.AppKey)
 	xmlStr := toXMLStr(reqMap)
 
-	data, err := c.doHTTPRequest(req.URI(), xmlStr)
+	uri := req.URI()
+	if c.config.SandBox {
+		uri = req.SandBoxURI()
+	}
+
+	data, err := c.doHTTPRequest(uri, xmlStr)
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +186,38 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 		return nil, err
 	}
 	return result, nil
+}
+
+// GetSandBoxSignKey gets sandox sign key from Weixin.
+func (c *Client) GetSandBoxSignKey() (*GetSandBoxSignKeyRsp, error) {
+	req := getSandBoxSignKeyReq{
+		MchID:    c.config.MchID,
+		NonceStr: generateNonceStr(),
+	}
+
+	reqMap, err := toMap(req)
+	if err != nil {
+		return nil, err
+	}
+
+	reqMap["sign"] = signature(reqMap, c.config.AppKey)
+	xmlStr := toXMLStr(reqMap)
+
+	data, err := c.doHTTPRequest(req.SandBoxURI(), xmlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &GetSandBoxSignKeyRsp{}
+	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	if rsp.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+	}
+
+	return rsp, nil
 }
 
 func (c *Client) doHTTPRequest(uri string, xmlStr string) ([]byte, error) {
