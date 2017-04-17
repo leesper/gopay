@@ -42,8 +42,7 @@ func NewClient(cfg Config) *Client {
 }
 
 // UnifiedOrder creates new order from Weixin.
-func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (string, error) {
-
+func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*UnifiedOrderRsp, error) {
 	req := unifiedOrderReq{
 		AppID:          c.config.AppID,
 		MchID:          c.config.MchID,
@@ -59,7 +58,7 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (str
 
 	reqMap, err := toMap(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	reqMap["sign"] = signature(reqMap, c.config.AppKey)
@@ -67,33 +66,33 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (str
 
 	data, err := c.doHTTPRequest(req.URI(), xmlStr)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	rsp := unifiedOrderRsp{}
-	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(&rsp); err != nil {
-		return "", err
+	rsp := &UnifiedOrderRsp{}
+	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
 	}
 
 	rspMap, err := toMap(rsp)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	rspSign := signature(rspMap, c.config.AppKey)
 	if rspSign != rspMap["sign"] {
-		return "", fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
 	}
 
 	if rsp.ReturnCode != Success {
-		return "", fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
 	}
 
 	if rsp.ResultCode != Success {
-		return "", fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
 	}
 
-	return rsp.PrepayID, nil
+	return rsp, nil
 }
 
 // ToPayment returns Payment from prePayID.
@@ -121,13 +120,58 @@ func (c *Client) ToPayment(prePayID string) Payment {
 }
 
 // QueryOrder queries order info from Weixin.
-func (c *Client) QueryOrder() {}
+func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
+	req := queryOrderReq{
+		AppID:         c.config.AppID,
+		MchID:         c.config.MchID,
+		TransactionID: transID,
+		NonceStr:      generateNonceStr(),
+	}
+
+	reqMap, err := toMap(req)
+	if err != nil {
+		return nil, err
+	}
+
+	reqMap["sign"] = signature(reqMap, c.config.AppKey)
+	xmlStr := toXMLStr(reqMap)
+
+	data, err := c.doHTTPRequest(req.URI(), xmlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &QueryOrderRsp{}
+	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	rspMap, err := toMap(rsp)
+	if err != nil {
+		return nil, err
+	}
+
+	rspSign := signature(rspMap, c.config.AppKey)
+	if rspSign != rspMap["sign"] {
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+	}
+
+	if rsp.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+	}
+
+	if rsp.ResultCode != Success {
+		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+	}
+
+	return rsp, nil
+}
 
 // AsyncNotification retrieves the asynchronous notification from Weixin.
 func (c *Client) AsyncNotification() {}
 
-func (c *Client) doHTTPRequest(api string, xmlStr string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodPost, api, bytes.NewReader([]byte(xmlStr)))
+func (c *Client) doHTTPRequest(uri string, xmlStr string) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewReader([]byte(xmlStr)))
 	if err != nil {
 		return nil, err
 	}
