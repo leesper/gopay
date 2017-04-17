@@ -78,7 +78,6 @@ type QueryOrderRsp struct {
 	IsSubscribe    string   `xml:"is_subscribe"`
 	TradeType      string   `xml:"trade_type"`
 	TradeState     string   `xml:"trade_state"`
-	TradeStateDesc string   `xml:"trade_state_desc"`
 	BankType       string   `xml:"bank_type"`
 	TotalFee       string   `xml:"total_fee"`
 	FeeType        string   `xml:"fee_type"`
@@ -90,4 +89,34 @@ type QueryOrderRsp struct {
 	OutTradeNo     string   `xml:"out_trade_no"`
 	Attach         string   `xml:"attach"`
 	TimeEnd        string   `xml:"time_end"`
+	TradeStateDesc string   `xml:"trade_state_desc"`
+}
+
+// AsyncNotificationResult is the result return from Weixin.
+type AsyncNotificationResult struct {
+	ReturnCode     string `xml:"return_code"`
+	ReturnMsg      string `xml:"return_msg"`
+	AppID          string `xml:"appid"`
+	MchID          string `xml:"mch_id"`
+	NonceStr       string `xml:"nonce_str"`
+	Sign           string `xml:"sign"`
+	ResultCode     string `xml:"result_code"`
+	ErrCode        string `xml:"err_code"`
+	ErrCodeDesc    string `xml:"err_code_des"`
+	DeviceInfo     string `xml:"device_info"`
+	OpenID         string `xml:"open_id"`
+	IsSubscribe    string `xml:"is_subscribe"`
+	TradeType      string `xml:"trade_type"`
+	BankType       string `xml:"bank_type"`
+	TotalFee       string `xml:"total_fee"`
+	FeeType        string `xml:"fee_type"`
+	CashFee        string `xml:"cash_fee"`
+	CashFeeType    string `xml:"cash_fee_type"`
+	CouponFee      string `xml:"coupon_fee"`
+	CouponCount    string `xml:"coupon_count"`
+	TransactionID  string `xml:"transaction_id"`
+	OutTradeNo     string `xml:"out_trade_no"`
+	Attach         string `xml:"attach"`
+	TimeEnd        string `xml:"time_end"`
+	TradeStateDesc string `xml:"trade_state_desc"`
 }

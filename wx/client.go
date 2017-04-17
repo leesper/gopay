@@ -168,7 +168,14 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 }
 
 // AsyncNotification retrieves the asynchronous notification from Weixin.
-func (c *Client) AsyncNotification() {}
+func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult, error) {
+	defer req.Body.Close()
+	result := &AsyncNotificationResult{}
+	if err := xml.NewDecoder(req.Body).Decode(result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
 
 func (c *Client) doHTTPRequest(uri string, xmlStr string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewReader([]byte(xmlStr)))
