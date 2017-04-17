@@ -65,7 +65,7 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (str
 	reqMap["sign"] = signature(reqMap, c.config.AppKey)
 	xmlStr := toXMLStr(reqMap)
 
-	data, err := c.doHTTPRequest(req.API(), xmlStr)
+	data, err := c.doHTTPRequest(req.URI(), xmlStr)
 	if err != nil {
 		return "", err
 	}
@@ -94,6 +94,30 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (str
 	}
 
 	return rsp.PrepayID, nil
+}
+
+// ToPayment returns Payment from prePayID.
+func (c *Client) ToPayment(prePayID string) Payment {
+	nonceStr := generateNonceStr()
+	timestampStr := generateTimestampStr()
+	params := map[string]string{
+		"appid":     c.config.AppID,
+		"partnerid": c.config.MchID,
+		"prepayid":  prePayID,
+		"noncestr":  nonceStr,
+		"timestamp": timestampStr,
+		"package":   "Sign=WXPay",
+	}
+
+	return Payment{
+		AppID:     c.config.AppID,
+		PartnerID: c.config.MchID,
+		PrepayID:  prePayID,
+		NonceStr:  nonceStr,
+		Timestamp: timestampStr,
+		Package:   "Sign=WXPay",
+		Sign:      signature(params, c.config.AppKey),
+	}
 }
 
 // QueryOrder queries order info from Weixin.

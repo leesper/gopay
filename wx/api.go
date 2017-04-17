@@ -2,6 +2,17 @@ package wx
 
 import "encoding/xml"
 
+// Payment returns to App.
+type Payment struct {
+	AppID     string
+	PartnerID string
+	PrepayID  string
+	NonceStr  string
+	Timestamp string
+	Package   string
+	Sign      string
+}
+
 type unifiedOrderReq struct {
 	XMLName        xml.Name `xml:"xml"`
 	AppID          string   `xml:"appid"`
@@ -16,7 +27,7 @@ type unifiedOrderReq struct {
 	TradeType      string   `xml:"trade_type"`
 }
 
-func (req unifiedOrderReq) API() string {
+func (req unifiedOrderReq) URI() string {
 	return "https://api.mch.weixin.qq.com/pay/unifiedorder"
 }
 

@@ -68,3 +68,8 @@ func toXMLStr(params map[string]string) string {
 	xml += "</xml>"
 	return xml
 }
+
+func generateTimestampStr() string {
+	const ChinaTimeZoneOffset = 8 * 60 * 60 // UTC + 8
+	return fmt.Sprintf("%d", time.Now().Unix()+ChinaTimeZoneOffset)
+}
