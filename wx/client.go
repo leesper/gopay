@@ -244,6 +244,8 @@ func (c *Client) doHTTPRequest(uri string, xmlStr string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("Content-type", "application/x-www-form-urlencoded;charset=UTF-8")
+
 	rsp, err := c.tlsClient.Do(req)
 	if err != nil {
 		return nil, err
