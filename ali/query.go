@@ -1,7 +1,7 @@
 package ali
 
-// QueryOrderReq requests alipay.trade.query.
-type QueryOrderReq struct{}
+// QueryTradeReq requests alipay.trade.query.
+type QueryTradeReq struct{}
 
-// QueryOrderRsp responses alipay.trade.query.
-type QueryOrderRsp struct{}
+// QueryTradeRsp responses alipay.trade.query.
+type QueryTradeRsp struct{}

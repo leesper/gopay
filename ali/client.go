@@ -1,16 +1,41 @@
 package ali
 
 import (
+	"bytes"
+	"crypto"
 	"crypto/tls"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strings"
 )
+
+// misc constants
+const (
+	RSA  = "RSA"
+	RSA2 = "RSA2"
+)
+
+// PayParam is the interface of all AliPay APIs.
+type PayParam interface {
+	URI() string
+	ExtraParams() map[string]string
+	BizContent() string
+}
 
 // Config contains all configuration info.
 type Config struct {
-	AppID     string
-	AppKey    string
-	NotifyURL string
-	SandBox   bool
+	APIGateway    string
+	AppID         string
+	AppKey        string
+	NotifyURL     string
+	SandBox       bool
+	SignType      string
+	aliPublicKey  []byte
+	appPublicKey  []byte
+	appPrivateKey []byte
 }
 
 // Client handles all transactions.
@@ -31,8 +56,60 @@ func NewClient(cfg Config) *Client {
 	}
 }
 
-// CreateOrder creates order from Alipay.
-func (c *Client) CreateOrder() {}
+// CreateTrade creates order from Alipay.
+func (c *Client) CreateTrade(req PayParam) (*CreateTradeRsp, error) {
+	data, err := c.doHTTPRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	rsp := &CreateTradeRsp{}
+	if err = json.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
 
-// QueryOrder queries order from Alipay.
-func (c *Client) QueryOrder() {}
+	responseStr := marshalJSON(rsp.TradeCreateResponse)
+	var ok bool
+	if c.config.SignType == RSA {
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA1)
+	} else if c.config.SignType == RSA2 {
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA256)
+	}
+
+	if !ok {
+		return nil, errors.New("verify signature failed")
+	}
+
+	if rsp.TradeCreateResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
+			rsp.TradeCreateResponse.Code, rsp.TradeCreateResponse.Msg,
+			rsp.TradeCreateResponse.SubCode, rsp.TradeCreateResponse.SubMsg)
+	}
+
+	return rsp, nil
+}
+
+// QueryTrade queries order from Alipay.
+func (c *Client) QueryTrade() {}
+
+func (c *Client) doHTTPRequest(param PayParam) ([]byte, error) {
+	reader := strings.NewReader(urlValues(c, param).Encode())
+	req, err := http.NewRequest(http.MethodPost, c.config.APIGateway, reader)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	rsp, err := c.tlsClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rsp.Body.Close()
+
+	data, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
