@@ -1,7 +1,7 @@
 package ali
 
-// CreateTradeReq requests alipay.trade.create.
-type CreateTradeReq struct {
+// CreateTradeParam requests alipay.trade.create.
+type CreateTradeParam struct {
 	AppAuthToken         string         `json:"-"`
 	NotifyURL            string         `json:"-"`
 	OutTradeNo           string         `json:"out_trade_no,omitempty"`
@@ -26,21 +26,21 @@ type CreateTradeReq struct {
 }
 
 // URI returns the uri.
-func (req CreateTradeReq) URI() string {
+func (p CreateTradeParam) URI() string {
 	return "alipay.trade.create"
 }
 
 // ExtraParams returns extra parameters.
-func (req CreateTradeReq) ExtraParams() map[string]string {
+func (p CreateTradeParam) ExtraParams() map[string]string {
 	return map[string]string{
-		"app_auth_token": req.AppAuthToken,
-		"notify_url":     req.NotifyURL,
+		"app_auth_token": p.AppAuthToken,
+		"notify_url":     p.NotifyURL,
 	}
 }
 
 // BizContent returns biz_content in JSON format.
-func (req CreateTradeReq) BizContent() string {
-	return marshalJSON(req)
+func (p CreateTradeParam) BizContent() string {
+	return marshalJSON(p)
 }
 
 // CreateTradeRsp responses alipay.trade.create.

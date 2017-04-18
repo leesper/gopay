@@ -57,8 +57,8 @@ func NewClient(cfg Config) *Client {
 }
 
 // CreateTrade creates order from Alipay.
-func (c *Client) CreateTrade(req PayParam) (*CreateTradeRsp, error) {
-	data, err := c.doHTTPRequest(req)
+func (c *Client) CreateTrade(p PayParam) (*CreateTradeRsp, error) {
+	data, err := c.doHTTPRequest(p)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,36 @@ func (c *Client) CreateTrade(req PayParam) (*CreateTradeRsp, error) {
 }
 
 // QueryTrade queries order from Alipay.
-func (c *Client) QueryTrade() {}
+func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
+	data, err := c.doHTTPRequest(p)
+	if err != nil {
+		return nil, err
+	}
+	rsp := &QueryTradeRsp{}
+	if err = json.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	responseStr := marshalJSON(rsp.TradeQueryResponse)
+	var ok bool
+	if c.config.SignType == RSA {
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA1)
+	} else if c.config.SignType == RSA2 {
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA256)
+	}
+
+	if !ok {
+		return nil, errors.New("verify signature failed")
+	}
+
+	if rsp.TradeQueryResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
+			rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg,
+			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
+	}
+
+	return rsp, nil
+}
 
 func (c *Client) doHTTPRequest(param PayParam) ([]byte, error) {
 	reader := strings.NewReader(urlValues(c, param).Encode())
