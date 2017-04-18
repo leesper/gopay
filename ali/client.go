@@ -180,10 +180,51 @@ type AsyncNotificationResult struct {
 
 // AsyncNotification retrieves the asynchronous notification from Weixin.
 func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult, error) {
-	defer req.Body.Close()
-	result := &AsyncNotificationResult{}
-	if err := json.NewDecoder(req.Body).Decode(result); err != nil {
-		return nil, err
+	if req == nil {
+		return nil, errors.New("http request nil")
 	}
-	return result, nil
+	req.ParseForm()
+
+	result := &AsyncNotificationResult{}
+	result.NotifyTime = req.PostFormValue("notify_time")
+	result.NotifyType = req.PostFormValue("notify_type")
+	result.NotifyID = req.PostFormValue("notify_id")
+	result.AppID = req.PostFormValue("app_id")
+	result.Charset = req.PostFormValue("charset")
+	result.Version = req.PostFormValue("version")
+	result.SignType = req.PostFormValue("sign_type")
+	result.Sign = req.PostFormValue("sign")
+	result.TradeNo = req.PostFormValue("trade_no")
+	result.OutTradeNo = req.PostFormValue("out_trade_no")
+	result.OutBizNo = req.PostFormValue("out_biz_no")
+	result.BuyerID = req.PostFormValue("buyer_id")
+	result.BuyerLogonID = req.PostFormValue("buyer_logon_id")
+	result.SellerID = req.PostFormValue("seller_id")
+	result.SellerEmail = req.PostFormValue("seller_email")
+	result.TradeStatus = req.PostFormValue("trade_status")
+	result.TotalAmount = req.PostFormValue("total_amount")
+	result.ReceiptAmount = req.PostFormValue("receipt_amount")
+	result.InvoiceAmount = req.PostFormValue("invoice_amount")
+	result.BuyerPayAmount = req.PostFormValue("buyer_pay_amount")
+	result.PointAmount = req.PostFormValue("point_amount")
+	result.RefundFee = req.PostFormValue("refund_fee")
+	result.Subject = req.PostFormValue("subject")
+	result.Body = req.PostFormValue("body")
+	result.GmtCreate = req.PostFormValue("gmt_create")
+	result.GmtPayment = req.PostFormValue("gmt_payment")
+	result.GmtRefund = req.PostFormValue("gmt_refund")
+	result.GmtClose = req.PostFormValue("gmt_close")
+	result.FundBillList = req.PostFormValue("fund_bill_list")
+	result.PassbackParams = req.PostFormValue("passback_params")
+	result.VoucherDetailList = req.PostFormValue("voucher_detail_list")
+
+	if result.NotifyID == "" {
+		return nil, errors.New("invalid notify ID")
+	}
+
+	ok := verify(req.PostForm, c.config.aliPublicKey, c.config.SignType)
+	if ok {
+		return result, nil
+	}
+	return nil, errors.New("verify signature failed")
 }
