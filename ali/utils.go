@@ -35,7 +35,7 @@ func urlValues(c *Client, param PayParam) url.Values {
 	}
 	sort.Strings(keys)
 
-	values.Add("sign", signature(keys, values, c.config.appPrivateKey, c.config.SignType))
+	values.Add("sign", signature(keys, values, c.config.AppPrivateKey, c.config.SignType))
 	return values
 }
 

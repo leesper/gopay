@@ -29,13 +29,12 @@ type PayParam interface {
 type Config struct {
 	APIGateway    string
 	AppID         string
-	AppKey        string
 	NotifyURL     string
 	SandBox       bool
 	SignType      string
-	aliPublicKey  []byte
-	appPublicKey  []byte
-	appPrivateKey []byte
+	AliPublicKey  []byte
+	AppPublicKey  []byte
+	AppPrivateKey []byte
 }
 
 // Client handles all transactions.
@@ -57,7 +56,8 @@ func NewClient(cfg Config) *Client {
 }
 
 // CreateTrade creates order from Alipay.
-func (c *Client) CreateTrade(p PayParam) (*CreateTradeRsp, error) {
+func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
+	p.NotifyURL = c.config.NotifyURL
 	data, err := c.doHTTPRequest(p)
 	if err != nil {
 		return nil, err
@@ -70,9 +70,9 @@ func (c *Client) CreateTrade(p PayParam) (*CreateTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeCreateResponse)
 	var ok bool
 	if c.config.SignType == RSA {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA1)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA256)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
 	}
 
 	if !ok {
@@ -102,9 +102,9 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA1)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.aliPublicKey, crypto.SHA256)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
 	}
 
 	if !ok {
@@ -222,7 +222,7 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 		return nil, errors.New("invalid notify ID")
 	}
 
-	ok := verify(req.PostForm, c.config.aliPublicKey, c.config.SignType)
+	ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
 	if ok {
 		return result, nil
 	}
