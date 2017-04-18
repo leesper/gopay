@@ -157,6 +157,10 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 		return nil, err
 	}
 
+	if rsp.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+	}
+
 	rspMap, err := toMap(rsp)
 	if err != nil {
 		return nil, err
@@ -165,10 +169,6 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 	rspSign := signature(rspMap, c.config.AppKey)
 	if rspSign != rspMap["sign"] {
 		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
-	}
-
-	if rsp.ReturnCode != Success {
-		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
 	}
 
 	if rsp.ResultCode != Success {
@@ -185,6 +185,25 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 	if err := xml.NewDecoder(req.Body).Decode(result); err != nil {
 		return nil, err
 	}
+
+	if result.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", result.ReturnCode, result.ReturnMsg)
+	}
+
+	rspMap, err := toMap(result)
+	if err != nil {
+		return nil, err
+	}
+
+	rspSign := signature(rspMap, c.config.AppKey)
+	if rspSign != rspMap["sign"] {
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+	}
+
+	if result.ResultCode != Success {
+		return nil, fmt.Errorf("err code %s, err code desc %s", result.ErrCode, result.ErrCodeDesc)
+	}
+
 	return result, nil
 }
 
