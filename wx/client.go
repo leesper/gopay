@@ -80,22 +80,21 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*Un
 		return nil, err
 	}
 
-	rspMap, err := toMap(rsp)
-	if err != nil {
-		return nil, err
-	}
-
-	rspSign := signature(rspMap, c.config.AppKey)
-	if rspSign != rspMap["sign"] {
-		return nil, fmt.Errorf("signature failed, expected %s, got %s, response %#v, rsp map %v", rspSign, rspMap["sign"], rsp, rspMap)
-	}
-
 	if rsp.ReturnCode != Success {
 		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
 	}
 
 	if rsp.ResultCode != Success {
 		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+	}
+
+	rspMap, err := toMap(rsp)
+	if err != nil {
+		return nil, err
+	}
+	rspSign := signature(rspMap, c.config.AppKey)
+	if rspSign != rspMap["sign"] {
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
 	}
 
 	return rsp, nil
@@ -161,6 +160,10 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
 	}
 
+	if rsp.ResultCode != Success {
+		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+	}
+
 	rspMap, err := toMap(rsp)
 	if err != nil {
 		return nil, err
@@ -169,10 +172,6 @@ func (c *Client) QueryOrder(transID string) (*QueryOrderRsp, error) {
 	rspSign := signature(rspMap, c.config.AppKey)
 	if rspSign != rspMap["sign"] {
 		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
-	}
-
-	if rsp.ResultCode != Success {
-		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
 	}
 
 	return rsp, nil
