@@ -207,6 +207,15 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 	return result, nil
 }
 
+// AnswerAsyncNotify returns a xml in string answering Weixin asynchronous notification.
+func (c *Client) AnswerAsyncNotify(returnCode, returnMsg string) string {
+	retMap := map[string]string{
+		"return_code": returnCode,
+		"return_msg":  returnMsg,
+	}
+	return toXMLStr(retMap)
+}
+
 // GetSandBoxSignKey gets sandox sign key from Weixin.
 func (c *Client) GetSandBoxSignKey() (*GetSandBoxSignKeyRsp, error) {
 	req := getSandBoxSignKeyReq{
