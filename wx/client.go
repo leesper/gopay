@@ -87,7 +87,7 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*Un
 
 	rspSign := signature(rspMap, c.config.AppKey)
 	if rspSign != rspMap["sign"] {
-		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+		return nil, fmt.Errorf("signature failed, expected %s, got %s, response %#v, rsp map %v", rspSign, rspMap["sign"], rsp, rspMap)
 	}
 
 	if rsp.ReturnCode != Success {
