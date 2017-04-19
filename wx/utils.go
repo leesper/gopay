@@ -62,6 +62,7 @@ func signature(params map[string]string, key string) string {
 	keyValueStr := strings.Join(keyValueConcat, "&")
 
 	keyValueSecret := keyValueStr + "&key=" + key
+	fmt.Printf("params %v, keyValueSecret %s\n", params, keyValueSecret)
 	return fmt.Sprintf("%X", md5.Sum([]byte(keyValueSecret)))
 }
 
