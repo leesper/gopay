@@ -49,11 +49,16 @@ func signature(params map[string]string, key string) string {
 		excluded[k] = v
 	}
 
-	var keyValueConcat []string
-	for k, v := range excluded {
-		keyValueConcat = append(keyValueConcat, fmt.Sprintf("%s=%s", k, v))
+	var sortedkeys []string
+	for k := range excluded {
+		sortedkeys = append(sortedkeys, k)
 	}
-	sort.Strings(keyValueConcat)
+	sort.Strings(sortedkeys)
+
+	var keyValueConcat []string
+	for _, k := range sortedkeys {
+		keyValueConcat = append(keyValueConcat, fmt.Sprintf("%s=%s", k, excluded[k]))
+	}
 	keyValueStr := strings.Join(keyValueConcat, "&")
 
 	keyValueSecret := keyValueStr + "&key=" + key
