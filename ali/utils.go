@@ -70,7 +70,7 @@ func signature(keys []string, values url.Values, privateKey []byte, signType str
 func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
-		fmt.Println("BLOCK", block)
+		fmt.Println("BLOCK", block, len(privateKey))
 		return ""
 	}
 
