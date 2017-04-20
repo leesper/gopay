@@ -67,6 +67,12 @@ func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
 		return nil, err
 	}
 
+	if rsp.TradeCreateResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
+			rsp.TradeCreateResponse.Code, rsp.TradeCreateResponse.Msg,
+			rsp.TradeCreateResponse.SubCode, rsp.TradeCreateResponse.SubMsg)
+	}
+
 	responseStr := marshalJSON(rsp.TradeCreateResponse)
 	var ok bool
 	if c.config.SignType == RSA {
@@ -77,12 +83,6 @@ func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
 
 	if !ok {
 		return nil, errors.New("verify signature failed")
-	}
-
-	if rsp.TradeCreateResponse.Code != "10000" {
-		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
-			rsp.TradeCreateResponse.Code, rsp.TradeCreateResponse.Msg,
-			rsp.TradeCreateResponse.SubCode, rsp.TradeCreateResponse.SubMsg)
 	}
 
 	return rsp, nil
@@ -99,6 +99,12 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 		return nil, err
 	}
 
+	if rsp.TradeQueryResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
+			rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg,
+			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
+	}
+
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
@@ -109,12 +115,6 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 
 	if !ok {
 		return nil, errors.New("verify signature failed")
-	}
-
-	if rsp.TradeQueryResponse.Code != "10000" {
-		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
-			rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg,
-			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
 	}
 
 	return rsp, nil
