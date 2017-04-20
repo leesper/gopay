@@ -196,7 +196,8 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 
 	rspSign := signature(rspMap, c.config.AppKey)
 	if rspSign != rspMap["sign"] {
-		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+		return nil, fmt.Errorf("signature failed, expected %s, got %s, result %#v, rspMap %v",
+			rspSign, rspMap["sign"], result, rspMap)
 	}
 
 	if result.ResultCode != Success {
