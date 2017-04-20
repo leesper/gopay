@@ -70,11 +70,13 @@ func signature(keys []string, values url.Values, privateKey []byte, signType str
 func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
+		fmt.Println("BLOCK", block)
 		return ""
 	}
 
 	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
+		fmt.Println("RSAPRIVATE", err)
 		return ""
 	}
 
@@ -84,6 +86,7 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 
 	s, err := rsa.SignPKCS1v15(nil, rsaPrivateKey, hash, hashed)
 	if err != nil {
+		fmt.Println("SIGNPKCS", err)
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString(s)
