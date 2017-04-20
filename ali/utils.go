@@ -36,7 +36,7 @@ func urlValues(c *Client, param PayParam) url.Values {
 	sort.Strings(keys)
 
 	values.Add("sign", signature(keys, values, c.config.AppPrivateKey, c.config.SignType))
-	fmt.Printf("VALUES %v, CONFIG %v\n", values, c.config)
+	fmt.Printf("VALUES %v\n", values)
 	return values
 }
 
@@ -54,12 +54,15 @@ func signature(keys []string, values url.Values, privateKey []byte, signType str
 	}
 
 	concat := strings.Join(valueList, "&")
+	fmt.Println("CONCAT", concat)
 
 	var sign string
 	if signType == "RSA" {
 		sign = signPKCS1v15([]byte(concat), privateKey, crypto.SHA1)
+		fmt.Println("RSA", sign)
 	} else if signType == "RSA2" {
 		sign = signPKCS1v15([]byte(concat), privateKey, crypto.SHA256)
+		fmt.Println("RSA2", sign)
 	}
 	return sign
 }
