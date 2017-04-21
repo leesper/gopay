@@ -143,80 +143,70 @@ func (c *Client) doHTTPRequest(param PayParam) ([]byte, error) {
 	return data, nil
 }
 
-// AsyncNotificationResult is the result return from Alipay.
-type AsyncNotificationResult struct {
-	NotifyTime        string `json:"notify_time"`         // 通知时间
-	NotifyType        string `json:"notify_type"`         // 通知类型
-	NotifyID          string `json:"notify_id"`           // 通知校验ID
-	AppID             string `json:"app_id"`              // 开发者的app_id
-	Charset           string `json:"charset"`             // 编码格式
-	Version           string `json:"version"`             // 接口版本
-	SignType          string `json:"sign_type"`           // 签名类型
-	Sign              string `json:"sign"`                // 签名
-	TradeNo           string `json:"trade_no"`            // 支付宝交易号
-	OutTradeNo        string `json:"out_trade_no"`        // 商户订单号
-	OutBizNo          string `json:"out_biz_no"`          // 商户业务号
-	BuyerID           string `json:"buyer_id"`            // 买家支付宝用户号
-	BuyerLogonID      string `json:"buyer_logon_id"`      // 买家支付宝账号
-	SellerID          string `json:"seller_id"`           // 卖家支付宝用户号
-	SellerEmail       string `json:"seller_email"`        // 卖家支付宝账号
-	TradeStatus       string `json:"trade_status"`        // 交易状态
-	TotalAmount       string `json:"total_amount"`        // 订单金额
-	ReceiptAmount     string `json:"receipt_amount"`      // 实收金额
-	InvoiceAmount     string `json:"invoice_amount"`      // 开票金额
-	BuyerPayAmount    string `json:"buyer_pay_amount"`    // 付款金额
-	PointAmount       string `json:"point_amount"`        // 集分宝金额
-	RefundFee         string `json:"refund_fee"`          // 总退款金额
-	Subject           string `json:"subject"`             // 总退款金额
-	Body              string `json:"body"`                // 商品描述
-	GmtCreate         string `json:"gmt_create"`          // 交易创建时间
-	GmtPayment        string `json:"gmt_payment"`         // 交易付款时间
-	GmtRefund         string `json:"gmt_refund"`          // 交易退款时间
-	GmtClose          string `json:"gmt_close"`           // 交易结束时间
-	FundBillList      string `json:"fund_bill_list"`      // 支付金额信息
-	PassbackParams    string `json:"passback_params"`     // 回传参数
-	VoucherDetailList string `json:"voucher_detail_list"` // 优惠券信息
+// AsyncNotifyResult is the result return from Alipay.
+type AsyncNotifyResult struct {
+	NotifyTime       string `json:"notify_time"`
+	NotifyType       string `json:"notify_type"`
+	NotifyID         string `json:"notify_id"`
+	SignType         string `json:"sign_type"`
+	Sign             string `json:"sign"`
+	OutTradeNo       string `json:"out_trade_no"`
+	Subject          string `json:"subject"`
+	PaymentType      string `json:"payment_type"`
+	TradeNo          string `json:"trade_no"`
+	TradeStatus      string `json:"trade_status"`
+	GmtCreate        string `json:"gmt_create"`
+	GmtPayment       string `json:"gmt_payment"`
+	GmtClose         string `json:"gmt_close"`
+	SellerEmail      string `json:"seller_email"`
+	BuyerEmail       string `json:"buyer_email"`
+	SellerID         string `json:"seller_id"`
+	BuyerID          string `json:"buyer_id"`
+	Price            string `json:"price"`
+	TotalFee         string `json:"total_fee"`
+	Quantity         string `json:"quantity"`
+	Body             string `json:"body"`
+	Discount         string `json:"discount"`
+	IsTotalFeeAdjust string `json:"is_total_fee_adjust"`
+	UseCoupon        string `json:"use_coupon"`
+	RefundStatus     string `json:"refund_status"`
+	GmtRefund        string `json:"gmt_refund"`
 }
 
 // AsyncNotification retrieves the asynchronous notification from Weixin.
-func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult, error) {
+func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotifyResult, error) {
 	if req == nil {
 		return nil, errors.New("http request nil")
 	}
 	req.ParseForm()
 
-	result := &AsyncNotificationResult{}
+	result := &AsyncNotifyResult{}
 	result.NotifyTime = req.PostFormValue("notify_time")
 	result.NotifyType = req.PostFormValue("notify_type")
 	result.NotifyID = req.PostFormValue("notify_id")
-	result.AppID = req.PostFormValue("app_id")
-	result.Charset = req.PostFormValue("charset")
-	result.Version = req.PostFormValue("version")
 	result.SignType = req.PostFormValue("sign_type")
 	result.Sign = req.PostFormValue("sign")
-	result.TradeNo = req.PostFormValue("trade_no")
 	result.OutTradeNo = req.PostFormValue("out_trade_no")
-	result.OutBizNo = req.PostFormValue("out_biz_no")
-	result.BuyerID = req.PostFormValue("buyer_id")
-	result.BuyerLogonID = req.PostFormValue("buyer_logon_id")
-	result.SellerID = req.PostFormValue("seller_id")
-	result.SellerEmail = req.PostFormValue("seller_email")
-	result.TradeStatus = req.PostFormValue("trade_status")
-	result.TotalAmount = req.PostFormValue("total_amount")
-	result.ReceiptAmount = req.PostFormValue("receipt_amount")
-	result.InvoiceAmount = req.PostFormValue("invoice_amount")
-	result.BuyerPayAmount = req.PostFormValue("buyer_pay_amount")
-	result.PointAmount = req.PostFormValue("point_amount")
-	result.RefundFee = req.PostFormValue("refund_fee")
 	result.Subject = req.PostFormValue("subject")
-	result.Body = req.PostFormValue("body")
+	result.PaymentType = req.PostFormValue("payment_type")
+	result.TradeNo = req.PostFormValue("trade_no")
+	result.TradeStatus = req.PostFormValue("trade_status")
 	result.GmtCreate = req.PostFormValue("gmt_create")
 	result.GmtPayment = req.PostFormValue("gmt_payment")
-	result.GmtRefund = req.PostFormValue("gmt_refund")
 	result.GmtClose = req.PostFormValue("gmt_close")
-	result.FundBillList = req.PostFormValue("fund_bill_list")
-	result.PassbackParams = req.PostFormValue("passback_params")
-	result.VoucherDetailList = req.PostFormValue("voucher_detail_list")
+	result.SellerEmail = req.PostFormValue("seller_email")
+	result.BuyerEmail = req.PostFormValue("buyer_email")
+	result.SellerID = req.PostFormValue("seller_id")
+	result.BuyerID = req.PostFormValue("buyer_id")
+	result.Price = req.PostFormValue("price")
+	result.TotalFee = req.PostFormValue("total_fee")
+	result.Quantity = req.PostFormValue("quantity")
+	result.Body = req.PostFormValue("body")
+	result.Discount = req.PostFormValue("discount")
+	result.IsTotalFeeAdjust = req.PostFormValue("is_total_fee_adjust")
+	result.UseCoupon = req.PostFormValue("use_coupon")
+	result.RefundStatus = req.PostFormValue("refund_status")
+	result.GmtRefund = req.PostFormValue("gmt_refund")
 
 	if result.NotifyID == "" {
 		return nil, errors.New("invalid notify ID")
