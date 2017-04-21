@@ -75,8 +75,8 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 		return ""
 	}
 
-	// rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	rsaPrivateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	// rsaPrivateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		fmt.Println("RSAPRIVATE", err)
 		return ""
@@ -86,7 +86,8 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 	h.Write(source)
 	hashed := h.Sum(nil)
 
-	s, err := rsa.SignPKCS1v15(rand.Reader, rsaPrivateKey.(*rsa.PrivateKey), hash, hashed)
+	s, err := rsa.SignPKCS1v15(rand.Reader, rsaPrivateKey, hash, hashed)
+	// s, err := rsa.SignPKCS1v15(rand.Reader, rsaPrivateKey.(*rsa.PrivateKey), hash, hashed)
 	if err != nil {
 		fmt.Println("SIGNPKCS", err)
 		return ""
