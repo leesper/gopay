@@ -85,10 +85,8 @@ func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeCreateResponse)
 	var ok bool
 	if c.config.SignType == RSA {
-		fmt.Println("RRRRRRRRRSSSSSSSSSSSSAAAAAAAAAAA")
 		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
-		fmt.Println("RRRRRRRRRSSSSSSSSSSSSAAAAAAAAAAA22222222222222222222222222222222222222")
 		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
 	}
 
@@ -120,8 +118,10 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
+		fmt.Println("RRRRRRRRRSSSSSSSSSSSSAAAAAAAAAAA")
 		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
+		fmt.Println("RRRRRRRRRSSSSSSSSSSSSAAAAAAAAAAA22222222222222222222222222222222222222")
 		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA256)
 	}
 
