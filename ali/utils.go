@@ -119,11 +119,7 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 	for _, k := range excluded {
 		v := strings.TrimSpace(values.Get(k))
 		if v != "" {
-			vdecoded, err := base64.StdEncoding.DecodeString(v)
-			if err != nil {
-				fmt.Println(err)
-			}
-			valueList = append(valueList, fmt.Sprintf("%s=%s", k, string(vdecoded)))
+			valueList = append(valueList, fmt.Sprintf("%s=%s", k, v))
 		}
 	}
 	concat := strings.Join(valueList, "&")
