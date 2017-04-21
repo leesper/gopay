@@ -110,8 +110,6 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 	}
 	concat := strings.Join(valueList, "&")
 
-	fmt.Println("CONCAT", concat)
-
 	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
 	if err != nil {
 		return false
