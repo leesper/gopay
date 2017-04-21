@@ -222,6 +222,8 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 		return nil, errors.New("invalid notify ID")
 	}
 
+	fmt.Println("ASYNC RESULT", result)
+
 	ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
 	if ok {
 		return result, nil
