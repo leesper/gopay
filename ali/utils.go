@@ -96,13 +96,10 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 }
 
 func verify(values url.Values, publicKey []byte, signType string) bool {
-	fmt.Println("VALUES", values)
 	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
 	if err != nil {
 		return false
 	}
-
-	fmt.Println("DECODED", len(decoded), values.Get("sign"))
 
 	var excluded []string
 	for k := range values {

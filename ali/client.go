@@ -105,6 +105,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
 	}
 
+	fmt.Println("QUERY RSP", rsp)
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
@@ -211,8 +212,6 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotifyResult, error
 	if result.NotifyID == "" {
 		return nil, errors.New("invalid notify ID")
 	}
-
-	fmt.Printf("ASYNC RESULT %#v %s\n", result, result.Sign)
 
 	ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
 
