@@ -99,20 +99,20 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 		if k == "sign" || k == "sign_type" {
 			continue
 		}
-		if values.Get(k) != "" {
-			excluded = append(excluded, k)
-		}
+		excluded = append(excluded, k)
 	}
 	sort.Strings(excluded)
 
 	var valueList []string
 	for _, k := range excluded {
-		v := strings.TrimSpace(values.Get(k))
+		v := values.Get(k)
 		if v != "" {
 			valueList = append(valueList, fmt.Sprintf("%s=%s", k, v))
 		}
 	}
 	concat := strings.Join(valueList, "&")
+
+	fmt.Println("CONCAT", concat)
 
 	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
 	if err != nil {
