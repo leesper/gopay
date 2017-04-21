@@ -110,9 +110,9 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA1)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA256)
 	}
 
 	if !ok {
@@ -224,6 +224,8 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotifyResult, error
 	if result.NotifyID == "" {
 		return nil, errors.New("invalid notify ID")
 	}
+
+	fmt.Println("RESULT", result)
 
 	ok := verify(values, c.config.AliPublicKey, c.config.SignType)
 
