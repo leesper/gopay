@@ -104,11 +104,11 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 	fmt.Println("DECODED", len(decoded), values.Get("sign"))
 
 	var excluded []string
-	for k, v := range values {
+	for k := range values {
 		if k == "sign" || k == "sign_type" {
 			continue
 		}
-		if len(v) > 0 {
+		if len(values.Get(k)) > 0 {
 			excluded = append(excluded, k)
 		}
 	}
