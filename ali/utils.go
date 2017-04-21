@@ -58,10 +58,8 @@ func signature(keys []string, values url.Values, privateKey []byte, signType str
 	var sign string
 	if signType == "RSA" {
 		sign = signPKCS1v15([]byte(concat), privateKey, crypto.SHA1)
-		fmt.Println("RSA", sign)
 	} else if signType == "RSA2" {
 		sign = signPKCS1v15([]byte(concat), privateKey, crypto.SHA256)
-		fmt.Println("RSA2", sign)
 	}
 	return sign
 }

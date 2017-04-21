@@ -77,9 +77,9 @@ func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
 	responseStr := marshalJSON(rsp.TradeCreateResponse)
 	var ok bool
 	if c.config.SignType == RSA {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA1)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA1)
 	} else if c.config.SignType == RSA2 {
-		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
+		ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AppPublicKey, crypto.SHA256)
 	}
 
 	if !ok {
