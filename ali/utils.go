@@ -135,7 +135,7 @@ func verifyPKCS1v15(source, sign, publicKey []byte, hash crypto.Hash) bool {
 
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
-		fmt.Println("BLOCK", block)
+		fmt.Println("VERIFY BLOCK", block)
 		return false
 	}
 
