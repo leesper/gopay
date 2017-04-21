@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sort"
 	"strings"
 )
 
@@ -225,21 +224,8 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult,
 
 	fmt.Println("ASYNC RESULT", result, result.Sign)
 
-	// ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
+	ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
 
-	var excluded []string
-	for k := range req.PostForm {
-		if k == "sign" || k == "sign_type" {
-			continue
-		}
-		if len(req.PostFormValue(k)) > 0 {
-			excluded = append(excluded, k)
-		}
-	}
-	sort.Strings(excluded)
-
-	sign := signature(excluded, req.PostForm, c.config.AppPrivateKey, c.config.SignType)
-	ok := sign == result.Sign
 	if ok {
 		return result, nil
 	}
