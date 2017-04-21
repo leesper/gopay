@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -179,41 +180,52 @@ func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotifyResult, error
 	if req == nil {
 		return nil, errors.New("http request nil")
 	}
-	req.ParseForm()
+
+	defer req.Body.Close()
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	values, err := url.ParseQuery(string(body))
+	if err != nil {
+		return nil, err
+	}
 
 	result := &AsyncNotifyResult{}
-	result.NotifyTime = req.PostFormValue("notify_time")
-	result.NotifyType = req.PostFormValue("notify_type")
-	result.NotifyID = req.PostFormValue("notify_id")
-	result.SignType = req.PostFormValue("sign_type")
-	result.Sign = req.PostFormValue("sign")
-	result.OutTradeNo = req.PostFormValue("out_trade_no")
-	result.Subject = req.PostFormValue("subject")
-	result.PaymentType = req.PostFormValue("payment_type")
-	result.TradeNo = req.PostFormValue("trade_no")
-	result.TradeStatus = req.PostFormValue("trade_status")
-	result.GmtCreate = req.PostFormValue("gmt_create")
-	result.GmtPayment = req.PostFormValue("gmt_payment")
-	result.GmtClose = req.PostFormValue("gmt_close")
-	result.SellerEmail = req.PostFormValue("seller_email")
-	result.BuyerEmail = req.PostFormValue("buyer_email")
-	result.SellerID = req.PostFormValue("seller_id")
-	result.BuyerID = req.PostFormValue("buyer_id")
-	result.Price = req.PostFormValue("price")
-	result.TotalFee = req.PostFormValue("total_fee")
-	result.Quantity = req.PostFormValue("quantity")
-	result.Body = req.PostFormValue("body")
-	result.Discount = req.PostFormValue("discount")
-	result.IsTotalFeeAdjust = req.PostFormValue("is_total_fee_adjust")
-	result.UseCoupon = req.PostFormValue("use_coupon")
-	result.RefundStatus = req.PostFormValue("refund_status")
-	result.GmtRefund = req.PostFormValue("gmt_refund")
+	result.NotifyTime = values.Get("notify_time")
+	result.NotifyType = values.Get("notify_type")
+	result.NotifyID = values.Get("notify_id")
+	result.SignType = values.Get("sign_type")
+	result.Sign = values.Get("sign")
+	result.OutTradeNo = values.Get("out_trade_no")
+	result.Subject = values.Get("subject")
+	result.PaymentType = values.Get("payment_type")
+	result.TradeNo = values.Get("trade_no")
+	result.TradeStatus = values.Get("trade_status")
+	result.GmtCreate = values.Get("gmt_create")
+	result.GmtPayment = values.Get("gmt_payment")
+	result.GmtClose = values.Get("gmt_close")
+	result.SellerEmail = values.Get("seller_email")
+	result.BuyerEmail = values.Get("buyer_email")
+	result.SellerID = values.Get("seller_id")
+	result.BuyerID = values.Get("buyer_id")
+	result.Price = values.Get("price")
+	result.TotalFee = values.Get("total_fee")
+	result.Quantity = values.Get("quantity")
+	result.Body = values.Get("body")
+	result.Discount = values.Get("discount")
+	result.IsTotalFeeAdjust = values.Get("is_total_fee_adjust")
+	result.UseCoupon = values.Get("use_coupon")
+	result.RefundStatus = values.Get("refund_status")
+	result.GmtRefund = values.Get("gmt_refund")
 
 	if result.NotifyID == "" {
 		return nil, errors.New("invalid notify ID")
 	}
 
-	ok := verify(req.PostForm, c.config.AliPublicKey, c.config.SignType)
+	ok := verify(values, c.config.AliPublicKey, c.config.SignType)
 
 	if ok {
 		return result, nil

@@ -37,7 +37,6 @@ func urlValues(c *Client, param PayParam) url.Values {
 	sort.Strings(keys)
 
 	values.Add("sign", signature(keys, values, c.config.AppPrivateKey, c.config.SignType))
-	fmt.Printf("VALUES %v\n", values)
 	return values
 }
 
@@ -55,7 +54,6 @@ func signature(keys []string, values url.Values, privateKey []byte, signType str
 	}
 
 	concat := strings.Join(valueList, "&")
-	fmt.Println("CONCAT", concat)
 
 	var sign string
 	if signType == "RSA" {
@@ -96,21 +94,15 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 }
 
 func verify(values url.Values, publicKey []byte, signType string) bool {
-	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
-	if err != nil {
-		return false
-	}
-
 	var excluded []string
 	for k := range values {
 		if k == "sign" || k == "sign_type" {
 			continue
 		}
-		if len(values.Get(k)) > 0 {
+		if values.Get(k) != "" {
 			excluded = append(excluded, k)
 		}
 	}
-
 	sort.Strings(excluded)
 
 	var valueList []string
@@ -121,6 +113,11 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 		}
 	}
 	concat := strings.Join(valueList, "&")
+
+	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
+	if err != nil {
+		return false
+	}
 
 	var ok bool
 	if signType == "RSA" {
