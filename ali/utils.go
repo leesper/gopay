@@ -95,10 +95,13 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 }
 
 func verify(values url.Values, publicKey []byte, signType string) bool {
+	fmt.Println("VALUES", values)
 	decoded, err := base64.StdEncoding.DecodeString(values.Get("sign"))
 	if err != nil {
 		return false
 	}
+
+	fmt.Println("DECODED", decoded)
 
 	var excluded []string
 	for k, v := range values {
@@ -137,17 +140,20 @@ func verifyPKCS1v15(source, sign, publicKey []byte, hash crypto.Hash) bool {
 
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
+		fmt.Println("BLOCK", block)
 		return false
 	}
 
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
+		fmt.Println("ParsePKIXPublicKey", err)
 		return false
 	}
 
 	rsaPublicKey := pub.(*rsa.PublicKey)
 	err = rsa.VerifyPKCS1v15(rsaPublicKey, hash, hashed, sign)
 	if err != nil {
+		fmt.Println("VerifyPKCS1v15", err)
 		return false
 	}
 	return true
