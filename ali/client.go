@@ -175,8 +175,8 @@ type AsyncNotifyResult struct {
 	GmtRefund        string `json:"gmt_refund"`
 }
 
-// AsyncNotification retrieves the asynchronous notification from Weixin.
-func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotifyResult, error) {
+// AsyncNotify retrieves the asynchronous notification from Weixin.
+func (c *Client) AsyncNotify(req *http.Request) (*AsyncNotifyResult, error) {
 	if req == nil {
 		return nil, errors.New("http request nil")
 	}

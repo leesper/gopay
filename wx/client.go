@@ -178,10 +178,10 @@ func (c *Client) QueryOrder(transID string, tradeNo string) (*QueryOrderRsp, err
 	return rsp, nil
 }
 
-// AsyncNotification retrieves the asynchronous notification from Weixin.
-func (c *Client) AsyncNotification(req *http.Request) (*AsyncNotificationResult, error) {
+// AsyncNotify retrieves the asynchronous notification from Weixin.
+func (c *Client) AsyncNotify(req *http.Request) (*AsyncNotifyResult, error) {
 	defer req.Body.Close()
-	result := &AsyncNotificationResult{}
+	result := &AsyncNotifyResult{}
 	if err := xml.NewDecoder(req.Body).Decode(result); err != nil {
 		return nil, err
 	}
@@ -249,8 +249,8 @@ func (c *Client) GetSandBoxSignKey() (*GetSandBoxSignKeyRsp, error) {
 	return rsp, nil
 }
 
-// AsyncNotificationResult is the result return from Weixin.
-type AsyncNotificationResult struct {
+// AsyncNotifyResult is the result return from Weixin.
+type AsyncNotifyResult struct {
 	ReturnCode    string `xml:"return_code"`    // 返回状态码
 	ReturnMsg     string `xml:"return_msg"`     // 返回信息
 	AppID         string `xml:"appid"`          // 应用ID
