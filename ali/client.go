@@ -106,7 +106,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
 	}
 
-	fmt.Println("QUERY RSP", rsp)
+	fmt.Printf("QUERY RSP %#v\n", rsp)
 	responseStr := marshalJSON(rsp.TradeQueryResponse)
 	var ok bool
 	if c.config.SignType == RSA {
