@@ -116,6 +116,7 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 		return false
 	}
 
+	fmt.Println("EXCLUDED", excluded)
 	var ok bool
 	if signType == "RSA" {
 		ok = verifyPKCS1v15([]byte(concat), decoded, publicKey, crypto.SHA1)
