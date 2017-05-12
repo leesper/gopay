@@ -101,9 +101,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	}
 
 	if rsp.TradeQueryResponse.Code != "10000" {
-		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
-			rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg,
-			rsp.TradeQueryResponse.SubCode, rsp.TradeQueryResponse.SubMsg)
+		return nil, fmt.Errorf("code %s msg %s", rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg)
 	}
 
 	fmt.Printf("QUERY RSP %#v\n", rsp)
