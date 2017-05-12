@@ -104,6 +104,11 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 		return nil, fmt.Errorf("code %s msg %s", rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg)
 	}
 
+	values, err := toValues(rsp.TradeQueryResponse)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("VALUES", values, len(values))
 	fmt.Printf("QUERY RSP %#v\n", rsp)
 	fmt.Printf("RAW DATA %s\n", string(data))
 	// responseStr := marshalJSON(rsp.TradeQueryResponse)
@@ -113,11 +118,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	// } else if c.config.SignType == RSA2 {
 	// 	ok = verifyPKCS1v15([]byte(responseStr), []byte(rsp.Sign), c.config.AliPublicKey, crypto.SHA256)
 	// }
-	values, err := url.ParseQuery(string(data))
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("VALUES", values, len(values))
+
 	ok := verify(values, c.config.AliPublicKey, c.config.SignType)
 
 	if !ok {

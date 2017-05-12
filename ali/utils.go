@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"net/url"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
@@ -163,4 +164,26 @@ func marshalJSON(val interface{}) string {
 		return ""
 	}
 	return string(data)
+}
+
+func toValues(st interface{}) (url.Values, error) {
+	val := reflect.ValueOf(st)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+
+	if val.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("need a struct type, got %T", st)
+	}
+
+	typ := val.Type()
+	result := url.Values{}
+
+	for i := 0; i < val.NumField(); i++ {
+		sf := typ.Field(i)
+		if tag, ok := sf.Tag.Lookup("xml"); ok && tag != "" && tag != "xml" {
+			result.Add(tag, val.Field(i).String())
+		}
+	}
+	return result, nil
 }
