@@ -117,7 +117,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("VALUES %v\n", values)
+	fmt.Println("VALUES", values, len(values))
 	ok := verify(values, c.config.AliPublicKey, c.config.SignType)
 
 	if !ok {
