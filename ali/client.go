@@ -108,6 +108,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	if err != nil {
 		return nil, err
 	}
+	values.Add("sign", rsp.Sign)
 	fmt.Println("VALUES", values, len(values))
 	fmt.Printf("QUERY RSP %#v\n", rsp)
 	fmt.Printf("RAW DATA %s\n", string(data))
