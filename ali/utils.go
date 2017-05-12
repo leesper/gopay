@@ -181,7 +181,7 @@ func toValues(st interface{}) (url.Values, error) {
 
 	for i := 0; i < val.NumField(); i++ {
 		sf := typ.Field(i)
-		if tag, ok := sf.Tag.Lookup("xml"); ok && tag != "" && tag != "xml" {
+		if tag, ok := sf.Tag.Lookup("json"); ok && tag != "" {
 			result.Add(tag, val.Field(i).String())
 		}
 	}
