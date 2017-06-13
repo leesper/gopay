@@ -178,6 +178,117 @@ func (c *Client) QueryOrder(transID string, tradeNo string) (*QueryOrderRsp, err
 	return rsp, nil
 }
 
+func (c *Client) RefundOrder(transID, tradeNo, refundNo string, totalFee, refundFee int) (*RefundOrderRsp, error) {
+	req := refundOrderReq{
+		AppID:         c.config.AppID,
+		MchID:         c.config.MchID,
+		NonceStr:      generateNonceStr(),
+		TransactionID: transID,
+		OutTradeNo:    tradeNo,
+		OutRefundNo:   refundNo,
+		TotalFee:      fmt.Sprintf("%d", totalFee),
+		RefundFee:     fmt.Sprintf("%d", refundFee),
+	}
+
+	reqMap, err := toMap(req)
+	if err != nil {
+		return nil, err
+	}
+
+	reqMap["sign"] = signature(reqMap, c.config.AppKey)
+	xmlStr := toXMLStr(reqMap)
+
+	uri := req.URI()
+	if c.config.SandBox {
+		uri = req.SandBoxURI()
+	}
+
+	data, err := c.doHTTPRequest(uri, xmlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &RefundOrderRsp{}
+	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	if rsp.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+	}
+
+	if rsp.ResultCode != Success {
+		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+	}
+
+	rspMap, err := toMap(rsp)
+	if err != nil {
+		return nil, err
+	}
+
+	rspSign := signature(rspMap, c.config.AppKey)
+	if rspSign != rspMap["sign"] {
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+	}
+
+	return rsp, nil
+}
+
+func (c *Client) QueryRefund(transID, tradeNo, refundNo, refundID string) (*QueryRefundRsp, error) {
+	req := queryRefundReq{
+		AppID:         c.config.AppID,
+		MchID:         c.config.MchID,
+		NonceStr:      generateNonceStr(),
+		TransactionID: transID,
+		OutTradeNo:    tradeNo,
+		OutRefundNo:   refundNo,
+		RefundID:      refundID,
+	}
+
+	reqMap, err := toMap(req)
+	if err != nil {
+		return nil, err
+	}
+
+	reqMap["sign"] = signature(reqMap, c.config.AppKey)
+	xmlStr := toXMLStr(reqMap)
+
+	uri := req.URI()
+	if c.config.SandBox {
+		uri = req.SandBoxURI()
+	}
+
+	data, err := c.doHTTPRequest(uri, xmlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &QueryRefundRsp{}
+	if err = xml.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	if rsp.ReturnCode != Success {
+		return nil, fmt.Errorf("return code %s, return msg %s", rsp.ReturnCode, rsp.ReturnMsg)
+	}
+
+	if rsp.ResultCode != Success {
+		return nil, fmt.Errorf("err code %s, err code desc %s", rsp.ErrCode, rsp.ErrCodeDesc)
+	}
+
+	rspMap, err := toMap(rsp)
+	if err != nil {
+		return nil, err
+	}
+
+	rspSign := signature(rspMap, c.config.AppKey)
+	if rspSign != rspMap["sign"] {
+		return nil, fmt.Errorf("signature failed, expected %s, got %s", rspSign, rspMap["sign"])
+	}
+
+	return rsp, nil
+}
+
 // AsyncNotify retrieves the asynchronous notification from Weixin.
 func (c *Client) AsyncNotify(req *http.Request) (*AsyncNotifyResult, error) {
 	defer req.Body.Close()

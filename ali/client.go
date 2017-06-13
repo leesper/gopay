@@ -117,6 +117,40 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	return rsp, nil
 }
 
+func (c *Client) RefundTrade(p PayParam) (*RefundTradeRsp, error) {
+	data, err := c.doHTTPRequest(p)
+	if err != nil {
+		return nil, err
+	}
+	rsp := &RefundTradeRsp{}
+	if err = json.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	if rsp.TradeRefundResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s", rsp.TradeRefundResponse.Code, rsp.TradeRefundResponse.Msg)
+	}
+
+	return rsp, nil
+}
+
+func (c *Client) QueryRefund(p PayParam) (*QueryRefundRsp, error) {
+	data, err := c.doHTTPRequest(p)
+	if err != nil {
+		return nil, err
+	}
+	rsp := &QueryRefundRsp{}
+	if err = json.NewDecoder(bytes.NewReader(data)).Decode(rsp); err != nil {
+		return nil, err
+	}
+
+	if rsp.RefundQueryResponse.Code != "10000" {
+		return nil, fmt.Errorf("code %s msg %s", rsp.RefundQueryResponse.Code, rsp.RefundQueryResponse.Msg)
+	}
+
+	return rsp, nil
+}
+
 func (c *Client) doHTTPRequest(param PayParam) ([]byte, error) {
 	reader := strings.NewReader(urlValues(c, param).Encode())
 	req, err := http.NewRequest(http.MethodPost, c.config.APIGateway, reader)

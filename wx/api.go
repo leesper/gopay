@@ -100,6 +100,80 @@ type QueryOrderRsp struct {
 	TradeStateDesc string   `xml:"trade_state_desc"` // 交易状态描述
 }
 
+type refundOrderReq struct {
+	XMLName       xml.Name `xml:"xml"`
+	AppID         string   `xml:"appid"`          // 应用ID
+	MchID         string   `xml:"mch_id"`         // 商户号
+	NonceStr      string   `xml:"nonce_str"`      // 随机字符串
+	TransactionID string   `xml:"transaction_id"` // 微信订单号
+	OutTradeNo    string   `xml:"out_trade_no"`   // 商户订单号
+	OutRefundNo   string   `xml:"out_refund_no"`  // 商户退款单号
+	TotalFee      string   `xml:"total_fee"`      // 总金额
+	RefundFee     string   `xml:"refund_fee"`     // 退款金额
+}
+
+func (req refundOrderReq) URI() string {
+	return "https://api.mch.weixin.qq.com/secapi/pay/refund"
+}
+
+func (req refundOrderReq) SandBoxURI() string {
+	return "https://api.mch.weixin.qq.com/sandboxnew/secapi/pay/refund"
+}
+
+type RefundOrderRsp struct {
+	XMLName       xml.Name `xml:"xml"`
+	ReturnCode    string   `xml:"return_code"`    // 返回状态码
+	ReturnMsg     string   `xml:"return_msg"`     // 返回信息
+	ResultCode    string   `xml:"result_code"`    // 业务结果
+	ErrCode       string   `xml:"err_code"`       // 错误代码
+	ErrCodeDesc   string   `xml:"err_code_des"`   // 错误代码描述
+	AppID         string   `xml:"appid"`          // 应用APPID
+	MchID         string   `xml:"mch_id"`         // 商户号
+	NonceStr      string   `xml:"nonce_str"`      // 随机字符串
+	TransactionID string   `xml:"transaction_id"` // 微信订单号
+	OutTradeNo    string   `xml:"out_trade_no"`   // 商户订单号
+	OutRefundNo   string   `xml:"out_refund_no"`  // 商户退款单号
+	RefundID      string   `xml:"refund_id"`      // 微信退款单号
+	RefundFee     string   `xml:"refund_fee"`     // 退款金额
+	TotalFee      string   `xml:"total_fee"`      // 标价金额
+	CashFee       string   `xml:"cash_fee"`       // 现金支付金额
+}
+
+type queryRefundReq struct {
+	XMLName       xml.Name `xml:"xml"`
+	AppID         string   `xml:"appid"`          // 应用ID
+	MchID         string   `xml:"mch_id"`         // 商户号
+	NonceStr      string   `xml:"nonce_str"`      // 随机字符串
+	TransactionID string   `xml:"transaction_id"` // 微信订单号
+	OutTradeNo    string   `xml:"out_trade_no"`   // 商户订单号
+	OutRefundNo   string   `xml:"out_refund_no"`  // 商户退款单号
+	RefundID      string   `xml:"refund_id"`      // 微信退款单号
+}
+
+func (req queryRefundReq) URI() string {
+	return "https://api.mch.weixin.qq.com/pay/refundquery"
+}
+
+func (req queryRefundReq) SandBoxURI() string {
+	return "https://api.mch.weixin.qq.com/sandboxnew/pay/refundquery"
+}
+
+type QueryRefundRsp struct {
+	ReturnCode    string `xml:"return_code"`    // 返回状态码
+	ReturnMsg     string `xml:"return_msg"`     // 返回信息
+	ResultCode    string `xml:"result_code"`    // 业务结果
+	ErrCode       string `xml:"err_code"`       // 错误代码
+	ErrCodeDesc   string `xml:"err_code_des"`   // 错误代码描述
+	AppID         string `xml:"appid"`          // 应用APPID
+	MchID         string `xml:"mch_id"`         // 商户号
+	NonceStr      string `xml:"nonce_str"`      // 随机字符串
+	TransactionID string `xml:"transaction_id"` // 微信订单号
+	OutTradeNo    string `xml:"out_trade_no"`   // 商户订单号
+	TotalFee      string `xml:"total_fee"`      // 标价金额
+	CashFee       string `xml:"cash_fee"`       // 现金支付金额
+	RefundCount   string `xml:"refund_count"`   // 退款笔数
+}
+
 type getSandBoxSignKeyReq struct {
 	MchID    string `xml:"mch_id"`
 	NonceStr string `xml:"nonce_str"`
