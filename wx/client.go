@@ -3,7 +3,9 @@ package wx
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -40,6 +42,36 @@ func NewClient(cfg Config) *Client {
 		config:    cfg,
 		tlsClient: client,
 	}
+}
+
+// WithCertificate configures a *Client with certificates.
+func (c *Client) WithCertificate(certF, keyF, rootCAF string) error {
+	cert, err := tls.LoadX509KeyPair(certF, keyF)
+	if err != nil {
+		return err
+	}
+
+	data, err := ioutil.ReadFile(rootCAF)
+	if err != nil {
+		return err
+	}
+
+	pool := x509.NewCertPool()
+	ok := pool.AppendCertsFromPEM(data)
+	if !ok {
+		return errors.New("failed to parse root certificate")
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			RootCAs:      pool,
+		},
+	}
+	client := http.Client{Transport: tr}
+	c.tlsClient = client
+
+	return nil
 }
 
 // UnifiedOrder creates new order from Weixin.
