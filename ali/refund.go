@@ -1,15 +1,15 @@
 package ali
 
 type RefundTradeParam struct {
-	AppAuthToken string `json:"-"`
-	OutTradeNo   string `json:"out_trade_no"`
-	TradeNo      string `json:"trade_no"`
-	RefundAmount string `json:"refund_amount"`
-	RefundReason string `json:"refund_reason"`
-	OutRequestNo string `json:"out_request_no"`
-	OperatorID   string `json:"operator_id"`
-	StoreID      string `json:"store_id"`
-	TerminalID   string `json:"terminal_id"`
+	AppAuthToken string `json:"-"`              // 可选
+	OutTradeNo   string `json:"out_trade_no"`   // 商户订单号 与TradeNo二选一
+	TradeNo      string `json:"trade_no"`       // 支付宝交易号 与OutTradeNo二选一
+	RefundAmount string `json:"refund_amount"`  // 必须 退款的金额
+	RefundReason string `json:"refund_reason"`  // 可选 退款的原因说明
+	OutRequestNo string `json:"out_request_no"` // 可选 标识一次退款请求，同一笔交易多次退款需要保证唯一，如需部分退款，则此参数必传
+	OperatorID   string `json:"operator_id"`    // 可选 商户的操作员编号
+	StoreID      string `json:"store_id"`       // 可选 商户的门店编号
+	TerminalID   string `json:"terminal_id"`    // 可选 商户的终端编号
 }
 
 func (p RefundTradeParam) URI() string {
@@ -34,8 +34,8 @@ type RefundTradeRsp struct {
 		SubMsg               string `json:"sub_msg"`
 		TradeNo              string `json:"trade_no"`
 		OutTradeNo           string `json:"out_trade_no"`
-		OpenID               string `json:"open_id"`
 		BuyerLogonID         string `json:"buyer_logon_id"`
+		BuyerUserID          string `json:"buyer_user_id"`
 		FundChange           string `json:"fund_change"`
 		RefundFee            string `json:"refund_fee"`
 		GmtRefundPay         string `json:"gmt_refund_pay"`

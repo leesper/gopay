@@ -159,19 +159,20 @@ func (req queryRefundReq) SandBoxURI() string {
 }
 
 type QueryRefundRsp struct {
-	ReturnCode    string `xml:"return_code"`    // 返回状态码
-	ReturnMsg     string `xml:"return_msg"`     // 返回信息
-	ResultCode    string `xml:"result_code"`    // 业务结果
-	ErrCode       string `xml:"err_code"`       // 错误代码
-	ErrCodeDesc   string `xml:"err_code_des"`   // 错误代码描述
-	AppID         string `xml:"appid"`          // 应用APPID
-	MchID         string `xml:"mch_id"`         // 商户号
-	NonceStr      string `xml:"nonce_str"`      // 随机字符串
-	TransactionID string `xml:"transaction_id"` // 微信订单号
-	OutTradeNo    string `xml:"out_trade_no"`   // 商户订单号
-	TotalFee      string `xml:"total_fee"`      // 标价金额
-	CashFee       string `xml:"cash_fee"`       // 现金支付金额
-	RefundCount   string `xml:"refund_count"`   // 退款笔数
+	XMLName       xml.Name `xml:"xml"`
+	ReturnCode    string   `xml:"return_code"`    // 返回状态码
+	ReturnMsg     string   `xml:"return_msg"`     // 返回信息
+	ResultCode    string   `xml:"result_code"`    // 业务结果
+	ErrCode       string   `xml:"err_code"`       // 错误代码
+	ErrCodeDesc   string   `xml:"err_code_des"`   // 错误代码描述
+	AppID         string   `xml:"appid"`          // 应用APPID
+	MchID         string   `xml:"mch_id"`         // 商户号
+	NonceStr      string   `xml:"nonce_str"`      // 随机字符串
+	TransactionID string   `xml:"transaction_id"` // 微信订单号
+	OutTradeNo    string   `xml:"out_trade_no"`   // 商户订单号
+	TotalFee      string   `xml:"total_fee"`      // 标价金额
+	CashFee       string   `xml:"cash_fee"`       // 现金支付金额
+	RefundCount   string   `xml:"refund_count"`   // 退款笔数
 }
 
 type getSandBoxSignKeyReq struct {
