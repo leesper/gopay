@@ -25,6 +25,8 @@ type unifiedOrderReq struct {
 	SpbillCreateIP string   `xml:"spbill_create_ip"` // 终端IP
 	NotifyURL      string   `xml:"notify_url"`       // 通知地址
 	TradeType      string   `xml:"trade_type"`       // 交易类型
+	TimeStart      string   `xml:"time_start"`       // 交易起始时间
+	TimeExpire     string   `xml:"time_expire"`      // 交易结束时间
 }
 
 func (req unifiedOrderReq) URI() string {

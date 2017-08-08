@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // constants for response.
@@ -75,7 +76,7 @@ func (c *Client) WithCertificate(certF, keyF, rootCAF string) error {
 }
 
 // UnifiedOrder creates new order from Weixin.
-func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*UnifiedOrderRsp, error) {
+func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string, times ...time.Time) (*UnifiedOrderRsp, error) {
 	req := unifiedOrderReq{
 		AppID:          c.config.AppID,
 		MchID:          c.config.MchID,
@@ -87,6 +88,19 @@ func (c *Client) UnifiedOrder(totalFee int, desc, orderID, clientIP string) (*Un
 		SpbillCreateIP: clientIP,
 		NotifyURL:      c.config.NotifyURL,
 		TradeType:      c.config.TradeType,
+	}
+
+	if len(times) >= 2 {
+		startYr, startMon, startDay := times[0].Date()
+		startHr := times[0].Hour()
+		startMin := times[0].Minute()
+		startSec := times[0].Second()
+		expireYr, expireMon, expireDay := times[1].Date()
+		expireHr := times[1].Hour()
+		expireMin := times[1].Minute()
+		expireSec := times[1].Second()
+		req.TimeStart = fmt.Sprintf("%d%02d%02d%02d%02d%02d", startYr, startMon, startDay, startHr, startMin, startSec)
+		req.TimeExpire = fmt.Sprintf("%d%02d%02d%02d%02d%02d", expireYr, expireMon, expireDay, expireHr, expireMin, expireSec)
 	}
 
 	reqMap, err := toMap(req)

@@ -25,7 +25,8 @@ func toMap(st interface{}) (map[string]string, error) {
 
 	for i := 0; i < val.NumField(); i++ {
 		sf := typ.Field(i)
-		if tag, ok := sf.Tag.Lookup("xml"); ok && tag != "" && tag != "xml" {
+		sv := val.Field(i).String()
+		if tag, ok := sf.Tag.Lookup("xml"); ok && tag != "" && tag != "xml" && sv != "" {
 			result[tag] = val.Field(i).String()
 		}
 	}
