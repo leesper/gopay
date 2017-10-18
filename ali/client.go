@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/leesper/holmes"
 )
 
 // misc constants
@@ -221,6 +223,8 @@ func (c *Client) AsyncNotify(req *http.Request) (*AsyncNotifyResult, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	holmes.Debugln("values", values)
 
 	result := &AsyncNotifyResult{}
 	result.NotifyTime = values.Get("notify_time")
