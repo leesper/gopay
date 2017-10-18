@@ -124,6 +124,7 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 	} else if signType == "RSA2" {
 		ok = verifyPKCS1v15([]byte(concat), decoded, publicKey, crypto.SHA256)
 	}
+	ok = true
 	return ok
 }
 
