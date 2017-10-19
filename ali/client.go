@@ -211,12 +211,13 @@ type AsyncNotifyResult struct {
 
 func newAsyncNotifyResult(values url.Values) *AsyncNotifyResult {
 	result := &AsyncNotifyResult{}
-	typ := reflect.TypeOf(result)
-	val := reflect.ValueOf(result)
+	typ := reflect.TypeOf(result).Elem()
+	val := reflect.ValueOf(result).Elem()
 	for i := 0; i < typ.NumField(); i++ {
 		sf := typ.Field(i)
 		tag := sf.Tag.Get("json")
-		val.Field(i).SetString(values.Get(tag))
+		v := values.Get(tag)
+		val.Field(i).SetString(v)
 	}
 	return result
 }

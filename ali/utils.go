@@ -93,6 +93,7 @@ func signPKCS1v15(source, privateKey []byte, hash crypto.Hash) string {
 }
 
 func verify(values url.Values, publicKey []byte, signType string) bool {
+	fmt.Println(signType)
 	var excluded []string
 	for k := range values {
 		if k == "sign" || k == "sign_type" {
@@ -119,12 +120,11 @@ func verify(values url.Values, publicKey []byte, signType string) bool {
 	fmt.Println("EXCLUDED", excluded)
 	fmt.Println("CONCAT", concat)
 	var ok bool
-	if signType == "RSA" {
+	if signType == RSA {
 		ok = verifyPKCS1v15([]byte(concat), decoded, publicKey, crypto.SHA1)
-	} else if signType == "RSA2" {
+	} else if signType == RSA2 {
 		ok = verifyPKCS1v15([]byte(concat), decoded, publicKey, crypto.SHA256)
 	}
-	ok = true
 	return ok
 }
 
