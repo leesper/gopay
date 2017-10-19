@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/leesper/holmes"
@@ -17,8 +18,9 @@ import (
 
 // misc constants
 const (
-	RSA  = "RSA"
-	RSA2 = "RSA2"
+	RSA     = "RSA"
+	RSA2    = "RSA2"
+	Success = "10000"
 )
 
 // PayParam is the interface of all AliPay APIs.
@@ -70,7 +72,7 @@ func (c *Client) CreateTrade(p CreateTradeParam) (*CreateTradeRsp, error) {
 		return nil, err
 	}
 
-	if rsp.TradeCreateResponse.Code != "10000" {
+	if rsp.TradeCreateResponse.Code != Success {
 		return nil, fmt.Errorf("code %s msg %s err %s err msg %s",
 			rsp.TradeCreateResponse.Code, rsp.TradeCreateResponse.Msg,
 			rsp.TradeCreateResponse.SubCode, rsp.TradeCreateResponse.SubMsg)
@@ -102,7 +104,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 		return nil, err
 	}
 
-	if rsp.TradeQueryResponse.Code != "10000" {
+	if rsp.TradeQueryResponse.Code != Success {
 		return nil, fmt.Errorf("code %s msg %s", rsp.TradeQueryResponse.Code, rsp.TradeQueryResponse.Msg)
 	}
 
@@ -119,6 +121,7 @@ func (c *Client) QueryTrade(p PayParam) (*QueryTradeRsp, error) {
 	return rsp, nil
 }
 
+// RefundTrade refunds trade .
 func (c *Client) RefundTrade(p PayParam) (*RefundTradeRsp, error) {
 	data, err := c.doHTTPRequest(p)
 	if err != nil {
@@ -136,6 +139,7 @@ func (c *Client) RefundTrade(p PayParam) (*RefundTradeRsp, error) {
 	return rsp, nil
 }
 
+// QueryRefund queries the result of refund.
 func (c *Client) QueryRefund(p PayParam) (*QueryRefundRsp, error) {
 	data, err := c.doHTTPRequest(p)
 	if err != nil {
@@ -178,32 +182,43 @@ func (c *Client) doHTTPRequest(param PayParam) ([]byte, error) {
 
 // AsyncNotifyResult is the result return from Alipay.
 type AsyncNotifyResult struct {
-	NotifyTime       string `json:"notify_time"`
-	NotifyType       string `json:"notify_type"`
-	NotifyID         string `json:"notify_id"`
-	SignType         string `json:"sign_type"`
-	Sign             string `json:"sign"`
-	OutTradeNo       string `json:"out_trade_no"`
-	Subject          string `json:"subject"`
-	PaymentType      string `json:"payment_type"`
-	TradeNo          string `json:"trade_no"`
-	TradeStatus      string `json:"trade_status"`
-	GmtCreate        string `json:"gmt_create"`
-	GmtPayment       string `json:"gmt_payment"`
-	GmtClose         string `json:"gmt_close"`
-	SellerEmail      string `json:"seller_email"`
-	BuyerEmail       string `json:"buyer_email"`
-	SellerID         string `json:"seller_id"`
-	BuyerID          string `json:"buyer_id"`
-	Price            string `json:"price"`
-	TotalFee         string `json:"total_fee"`
-	Quantity         string `json:"quantity"`
-	Body             string `json:"body"`
-	Discount         string `json:"discount"`
-	IsTotalFeeAdjust string `json:"is_total_fee_adjust"`
-	UseCoupon        string `json:"use_coupon"`
-	RefundStatus     string `json:"refund_status"`
-	GmtRefund        string `json:"gmt_refund"`
+	AppID          string `json:"app_id"`
+	AuthAPPID      string `json:"auth_app_id"`
+	BuyerID        string `json:"buyer_id"`
+	BuyerLogonID   string `json:"buyer_logon_id"`
+	BuyerPayAmount string `json:"buyer_pay_amount"`
+	Charset        string `json:"charset"`
+	FundBillList   string `json:"fund_bill_list"`
+	GmtCreate      string `json:"gmt_create"`
+	GmtPayment     string `json:"gmt_payment"`
+	InvoiceAmount  string `json:"invoice_amount"`
+	NotifyID       string `json:"notify_id"`
+	NotifyTime     string `json:"notify_time"`
+	NotifyType     string `json:"notify_type"`
+	OutTradeNo     string `json:"out_trade_no"`
+	PointAmount    string `json:"point_amount"`
+	ReceiptAmount  string `json:"receipt_amount"`
+	SellerEmail    string `json:"seller_email"`
+	SellerID       string `json:"seller_id"`
+	Sign           string `json:"sign"`
+	SignType       string `json:"sign_type"`
+	Subject        string `json:"subject"`
+	TotalAmount    string `json:"total_amount"`
+	TradeNo        string `json:"trade_no"`
+	TradeStatus    string `json:"trade_status"`
+	Version        string `json:"version"`
+}
+
+func newAsyncNotifyResult(values url.Values) *AsyncNotifyResult {
+	result := &AsyncNotifyResult{}
+	typ := reflect.TypeOf(result)
+	val := reflect.ValueOf(result)
+	for i := 0; i < typ.NumField(); i++ {
+		sf := typ.Field(i)
+		tag := sf.Tag.Get("json")
+		val.Field(i).SetString(values.Get(tag))
+	}
+	return result
 }
 
 // AsyncNotify retrieves the asynchronous notification from Weixin.
@@ -226,33 +241,7 @@ func (c *Client) AsyncNotify(req *http.Request) (*AsyncNotifyResult, error) {
 
 	holmes.Debugln("values", values)
 
-	result := &AsyncNotifyResult{}
-	result.NotifyTime = values.Get("notify_time")
-	result.NotifyType = values.Get("notify_type")
-	result.NotifyID = values.Get("notify_id")
-	result.SignType = values.Get("sign_type")
-	result.Sign = values.Get("sign")
-	result.OutTradeNo = values.Get("out_trade_no")
-	result.Subject = values.Get("subject")
-	result.PaymentType = values.Get("payment_type")
-	result.TradeNo = values.Get("trade_no")
-	result.TradeStatus = values.Get("trade_status")
-	result.GmtCreate = values.Get("gmt_create")
-	result.GmtPayment = values.Get("gmt_payment")
-	result.GmtClose = values.Get("gmt_close")
-	result.SellerEmail = values.Get("seller_email")
-	result.BuyerEmail = values.Get("buyer_email")
-	result.SellerID = values.Get("seller_id")
-	result.BuyerID = values.Get("buyer_id")
-	result.Price = values.Get("price")
-	result.TotalFee = values.Get("total_fee")
-	result.Quantity = values.Get("quantity")
-	result.Body = values.Get("body")
-	result.Discount = values.Get("discount")
-	result.IsTotalFeeAdjust = values.Get("is_total_fee_adjust")
-	result.UseCoupon = values.Get("use_coupon")
-	result.RefundStatus = values.Get("refund_status")
-	result.GmtRefund = values.Get("gmt_refund")
+	result := newAsyncNotifyResult(values)
 
 	if result.NotifyID == "" {
 		return nil, errors.New("invalid notify ID")

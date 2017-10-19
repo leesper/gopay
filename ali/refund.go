@@ -1,5 +1,6 @@
 package ali
 
+// RefundTradeParam .
 type RefundTradeParam struct {
 	AppAuthToken string `json:"-"`              // 可选
 	OutTradeNo   string `json:"out_trade_no"`   // 商户订单号 与TradeNo二选一
@@ -12,20 +13,24 @@ type RefundTradeParam struct {
 	TerminalID   string `json:"terminal_id"`    // 可选 商户的终端编号
 }
 
+// URI returns the API URL.
 func (p RefundTradeParam) URI() string {
 	return "alipay.trade.refund"
 }
 
+// ExtraParams returns extra parameters.
 func (p RefundTradeParam) ExtraParams() map[string]string {
 	return map[string]string{
 		"app_auth_token": p.AppAuthToken,
 	}
 }
 
+// BizContent returns the JSON string of parameters.
 func (p RefundTradeParam) BizContent() string {
 	return marshalJSON(p)
 }
 
+// RefundTradeRsp .
 type RefundTradeRsp struct {
 	TradeRefundResponse struct {
 		Code                 string `json:"code"`
@@ -39,7 +44,7 @@ type RefundTradeRsp struct {
 		FundChange           string `json:"fund_change"`
 		RefundFee            string `json:"refund_fee"`
 		GmtRefundPay         string `json:"gmt_refund_pay"`
-		StoreName            string `store_name`
+		StoreName            string `json:"store_name"`
 		RefundDetailItemList []struct {
 			FundChannel string `json:"fund_channel"`
 			Amount      string `json:"amount"`
@@ -49,10 +54,12 @@ type RefundTradeRsp struct {
 	Sign string `json:"sign"`
 }
 
+// Success returns true if response is success
 func (r *RefundTradeRsp) Success() bool {
 	return r.TradeRefundResponse.Msg == "Success"
 }
 
+// QueryRefundParam .
 type QueryRefundParam struct {
 	AppAuthToken string `json:"-"`
 	OutTradeNo   string `json:"out_trade_no,omitempty"`
@@ -60,20 +67,24 @@ type QueryRefundParam struct {
 	OutRequestNo string `json:"out_request_no"`
 }
 
+// URI returns the API URL.
 func (p QueryRefundParam) URI() string {
 	return "alipay.trade.fastpay.refund.query"
 }
 
+// ExtraParams returns extra parameters.
 func (p QueryRefundParam) ExtraParams() map[string]string {
 	return map[string]string{
 		"app_auth_token": p.AppAuthToken,
 	}
 }
 
+// BizContent returns the JSON string of parameters.
 func (p QueryRefundParam) BizContent() string {
 	return marshalJSON(p)
 }
 
+// QueryRefundRsp .
 type QueryRefundRsp struct {
 	RefundQueryResponse struct {
 		Code         string `json:"code"`
